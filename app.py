@@ -74,6 +74,32 @@ def handle_message(event):
 # 處理訊息
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
+    if event.message.text == "新聞":
+        buttons_template = TemplateSendMessage(
+            alt_text='新聞 template',
+            template=ButtonsTemplate(
+                title='新聞類型',
+                text='請選擇',
+                thumbnail_image_url='https://i.imgur.com/vkqbLnz.png',
+                actions=[
+                    MessageTemplateAction(
+                        label='蘋果即時新聞',
+                        text='蘋果即時新聞'
+                    ),
+                    MessageTemplateAction(
+                        label='科技新報',
+                        text='科技新報'
+                    ),
+                    MessageTemplateAction(
+                        label='PanX泛科技',
+                        text='PanX泛科技'
+                    )
+                ]
+            )
+        )
+        line_bot_api.reply_message(event.reply_token, buttons_template)
+        return 0
+
     if event.message.text == "蘋果即時新聞":
         content = apple_news()
         line_bot_api.reply_message(
@@ -81,7 +107,9 @@ def handle_message(event):
             TextSendMessage(text=content))
         return 0
 
-
+    answer = get_answer(event.message.text)
+    message = TextSendMessage(text=answer)
+    line_bot_api.reply_message(event.reply_token, message)
 
 def get_answer(message_text):
     url = "https://robertbotman.azurewebsites.net/qnamaker/knowledgebases/1d8c9b09-00e3-432b-9ee0-18625e1ffd17/generateAnswer"
