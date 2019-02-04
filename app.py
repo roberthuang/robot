@@ -36,6 +36,37 @@ def apple_news():
         content += '{}\n\n'.format(link)
     return content
 
+def technews():
+    target_url = 'https://technews.tw/'
+    print('Start parsing movie ...')
+    rs = requests.session()
+    res = rs.get(target_url, verify=False)
+    res.encoding = 'utf-8'
+    soup = BeautifulSoup(res.text, 'html.parser')
+    content = ""
+
+    for index, data in enumerate(soup.select('article div h1.entry-title a')):
+        if index == 12:
+            return content
+        title = data.text
+        link = data['href']
+        content += '{}\n{}\n\n'.format(title, link)
+    return content
+
+def panx():
+    target_url = 'https://panx.asia/'
+    print('Start parsing ptt hot....')
+    rs = requests.session()
+    res = rs.get(target_url, verify=False)
+    soup = BeautifulSoup(res.text, 'html.parser')
+    content = ""
+    for data in soup.select('div.container div.row div.desc_wrap h2 a'):
+        title = data.text
+        link = data['href']
+        content += '{}\n{}\n\n'.format(title, link)
+    return content
+
+
 
 # 監聽所有來自 /callback 的 Post Request
 @app.route("/callback", methods=['POST'])
@@ -104,6 +135,20 @@ def handle_message(event):
 
     if event.message.text == "蘋果即時新聞":
         content = apple_news()
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=content))
+        return 0
+
+    if event.message.text == "科技新報":
+        content = technews()
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=content))
+        return 0
+
+    if event.message.text == "PanX泛科技":
+        content = panx()
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=content))
