@@ -74,7 +74,9 @@ def handle_message(event):
 # 處理訊息
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
-    if event.message.text == "新聞":
+    answer = get_answer(event.message.text)
+
+    if answer == "新聞":
         buttons_template = TemplateSendMessage(
             alt_text='新聞 template',
             template=ButtonsTemplate(
@@ -106,10 +108,6 @@ def handle_message(event):
             event.reply_token,
             TextSendMessage(text=content))
         return 0
-
-    answer = get_answer(event.message.text)
-    message = TextSendMessage(text=answer)
-    line_bot_api.reply_message(event.reply_token, message)
 
 def get_answer(message_text):
     url = "https://robertbotman.azurewebsites.net/qnamaker/knowledgebases/1d8c9b09-00e3-432b-9ee0-18625e1ffd17/generateAnswer"
