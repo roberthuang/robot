@@ -42,7 +42,7 @@ def handle_message(event):
 
 
 def get_answer(message_text):
-    url = "https://americandrama.azurewebsites.net/qnamaker/knowledgebases/1d8c9b09-00e3-432b-9ee0-18625e1ffd17/generateAnswer"
+    url = "https://robertbotman.azurewebsites.net/qnamaker/knowledgebases/1d8c9b09-00e3-432b-9ee0-18625e1ffd17/generateAnswer"
 
     # 發送request到QnAMaker Endpoint要答案
     response = requests.post(
