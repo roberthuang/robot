@@ -7,7 +7,7 @@ from linebot.exceptions import (
     InvalidSignatureError
 )
 from linebot.models import *
-
+import json
 app = Flask(__name__)
 
 # Channel Access Token
@@ -33,19 +33,42 @@ def callback():
 # 處理訊息
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
-    text=event.message.text
+    answer = get_answer(event.message.text)
 
-    if (text=="Hi"):
-        reply_text = "Hello"
-    elif(text=="你好"):
-        reply_text = "哈囉"
-    elif(text=="機器人"):
-        reply_text = "叫我嗎"
-    else:
-        reply_text = text
-
-    message = TextSendMessage(reply_text)
+    message = TextSendMessage(text=answer)
     line_bot_api.reply_message(event.reply_token, message)
+
+
+def get_answer(message_text):
+    url = "https://americandrama.azurewebsites.net/qnamaker/knowledgebases/1d8c9b09-00e3-432b-9ee0-18625e1ffd17/generateAnswer"
+
+    # 發送request到QnAMaker Endpoint要答案
+    response = requests.post(
+        url,
+        json.dumps({'question': message_text}),
+        headers={
+            'Content-Type': 'application/json',
+            'Authorization': 'EndpointKey 5f61f834-ddcd-474d-835a-623bb4602a9f'
+        }
+    )
+
+    data = response.json()
+
+    try:
+        # 我們使用免費service可能會超過限制（一秒可以發的request數）
+        if "error" in data:
+            return data["error"]["message"]
+        # 這裡我們預設取第一個答案
+        answer = data['answers'][0]['answer']
+
+        return answer
+
+    except Exception:
+
+        return "Error occurs when finding answer"
+
+
+
 
 import os
 if __name__ == "__main__":
