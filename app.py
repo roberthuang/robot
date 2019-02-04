@@ -10,6 +10,9 @@ from linebot.models import *
 
 import requests
 import json
+import random
+
+
 app = Flask(__name__)
 
 # Channel Access Token
