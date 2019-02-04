@@ -66,6 +66,18 @@ def panx():
         content += '{}\n{}\n\n'.format(title, link)
     return content
 
+def oil_price():
+    target_url = 'https://gas.goodlife.tw/'
+    rs = requests.session()
+    res = rs.get(target_url, verify=False)
+    soup = BeautifulSoup(res.text, 'html.parser')
+    title = soup.select('#main')[0].text.replace('\n', '').split('(')[0]
+    gas_price = soup.select('#gas-price')[0].text.replace('\n\n\n', '').replace(' ', '')
+    cpc = soup.select('#cpc')[0].text.replace(' ', '')
+    content = '{}\n{}{}'.format(title, gas_price, cpc)
+    return content
+
+
 def get_answer(message_text):
     url = "https://robertbotman.azurewebsites.net/qnamaker/knowledgebases/1d8c9b09-00e3-432b-9ee0-18625e1ffd17/generateAnswer"
 
@@ -181,7 +193,14 @@ def handle_message(event):
             TextSendMessage(text=content))
         return 0
 
-    message = TextSendMessage(text=answer)
+    if answer == "油價":
+        content = oil_price()
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=content))
+        return 0
+
+    message = TextSendMessage(text="別亂說話")
     line_bot_api.reply_message(event.reply_token, message)
 
 
