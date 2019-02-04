@@ -66,6 +66,33 @@ def panx():
         content += '{}\n{}\n\n'.format(title, link)
     return content
 
+def get_answer(message_text):
+    url = "https://robertbotman.azurewebsites.net/qnamaker/knowledgebases/1d8c9b09-00e3-432b-9ee0-18625e1ffd17/generateAnswer"
+
+    # 發送request到QnAMaker Endpoint要答案
+    response = requests.post(
+        url,
+        json.dumps({'question': message_text}),
+        headers={
+            'Content-Type': 'application/json',
+            'Authorization': 'EndpointKey 5f61f834-ddcd-474d-835a-623bb4602a9f'
+        }
+    )
+
+    data = response.json()
+
+    try:
+        # 我們使用免費service可能會超過限制（一秒可以發的request數）
+        if "error" in data:
+            return data["error"]["message"]
+        # 這裡我們預設取第一個答案
+        answer = data['answers'][0]['answer']
+
+        return answer
+
+    except Exception:
+
+        return "Error occurs when finding answer"
 
 
 # 監聽所有來自 /callback 的 Post Request
@@ -154,35 +181,8 @@ def handle_message(event):
             TextSendMessage(text=content))
         return 0
 
-def get_answer(message_text):
-    url = "https://robertbotman.azurewebsites.net/qnamaker/knowledgebases/1d8c9b09-00e3-432b-9ee0-18625e1ffd17/generateAnswer"
-
-    # 發送request到QnAMaker Endpoint要答案
-    response = requests.post(
-        url,
-        json.dumps({'question': message_text}),
-        headers={
-            'Content-Type': 'application/json',
-            'Authorization': 'EndpointKey 5f61f834-ddcd-474d-835a-623bb4602a9f'
-        }
-    )
-
-    data = response.json()
-
-    try:
-        # 我們使用免費service可能會超過限制（一秒可以發的request數）
-        if "error" in data:
-            return data["error"]["message"]
-        # 這裡我們預設取第一個答案
-        answer = data['answers'][0]['answer']
-
-        return answer
-
-    except Exception:
-
-        return "Error occurs when finding answer"
-
-
+    message = TextSendMessage(text=answer)
+    line_bot_api.reply_message(event.reply_token, message)
 
 
 import os
