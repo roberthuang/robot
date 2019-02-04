@@ -7,6 +7,7 @@ from linebot.exceptions import (
     InvalidSignatureError
 )
 from linebot.models import *
+from bs4 import BeautifulSoup
 
 import requests
 import json
@@ -19,6 +20,22 @@ app = Flask(__name__)
 line_bot_api = LineBotApi('X6HvDoq3VZFWZgOeyLKEShvaK36uQE0Sg+BE45L/sYR06SbYIiTuX33N/xTVP0xxcVlgYkUscTKvBV2W7gaI4gyTS/WRQsZp28GYggewsfGjK81IH7O41Xv7Si1Sl70qEVpBsC61C6RRQeeBjlp7AQdB04t89/1O/w1cDnyilFU=')
 # Channel Secret
 handler = WebhookHandler('b24033d9c9bff1aa900283ef483f04c4')
+
+
+def apple_news():
+    target_url = 'https://tw.appledaily.com/new/realtime'
+    print('Start parsing appleNews....')
+    rs = requests.session()
+    res = rs.get(target_url, verify=False)
+    soup = BeautifulSoup(res.text, 'html.parser')
+    content = ""
+    for index, data in enumerate(soup.select('.rtddt a'), 0):
+        if index == 5:
+            return content
+        link = data['href']
+        content += '{}\n\n'.format(link)
+    return content
+
 
 # 監聽所有來自 /callback 的 Post Request
 @app.route("/callback", methods=['POST'])
@@ -57,10 +74,13 @@ def handle_message(event):
 # 處理訊息
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
-    answer = get_answer(event.message.text)
+    if event.message.text == "蘋果即時新聞":
+        content = apple_news()
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=content))
+        return 0
 
-    message = TextSendMessage(text=answer)
-    line_bot_api.reply_message(event.reply_token, message)
 
 
 def get_answer(message_text):
