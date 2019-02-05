@@ -21,6 +21,23 @@ line_bot_api = LineBotApi('X6HvDoq3VZFWZgOeyLKEShvaK36uQE0Sg+BE45L/sYR06SbYIiTuX
 # Channel Secret
 handler = WebhookHandler('b24033d9c9bff1aa900283ef483f04c4')
 
+def movie():
+    target_url = 'https://movies.yahoo.com.tw/'
+    rs = requests.session()
+    res = rs.get(target_url, verify=False)
+    res.encoding = 'utf-8'
+    soup = BeautifulSoup(res.text, 'html.parser')
+    content = ""
+    for index, data in enumerate(soup.select('div.movielist_info h2 a')):
+        if index == 20:
+            return content
+        print("index:"+index)
+        print("data"+data)
+        print("data.text"+data.text)
+        title = data.text
+        link =  data['href']
+        content += '{}\n{}\n'.format(title, link)
+    return content
 
 def apple_news():
     target_url = 'https://tw.appledaily.com/new/realtime'
@@ -145,6 +162,13 @@ def handle_message(event):
 # 處理訊息
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
+    if event.message.txt == "電影":
+        content = movie()
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=content))
+        return 0
+
     if event.message.text == "蘋果即時新聞":
         content = apple_news()
         line_bot_api.reply_message(
