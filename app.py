@@ -230,6 +230,9 @@ def handle_message(event):
             TextSendMessage(text=content))
         return 0
 
+    if answer != "No good match found in KB.":
+        line_bot_api.reply_message(event.reply_token, TextSendMessage(text=answer))
+
 import os
 if __name__ == "__main__":
     port = int(os.environ.get('PORT', 5000))
