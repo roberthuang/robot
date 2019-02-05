@@ -230,6 +230,7 @@ def handle_message(event):
             TextSendMessage(text=content))
         return 0
 
+    print(answer)
     line_bot_api.reply_message(event.reply_token, TextSendMessage(text=answer))
 
 import os
