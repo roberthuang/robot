@@ -31,9 +31,9 @@ def movie():
     for index, data in enumerate(soup.select('div.movielist_info h2 a')):
         if index == 20:
             return content
-        print("index:"+index)
-        print("data"+data)
-        print("data.text"+data.text)
+        print(index)
+        print(data)
+        print(data.text)
         title = data.text
         link =  data['href']
         content += '{}\n{}\n'.format(title, link)
