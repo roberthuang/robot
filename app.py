@@ -73,10 +73,8 @@ def oil_price():
     soup = BeautifulSoup(res.text, 'html.parser')
     title = soup.select('#main')[0].text.replace('\n', '').split('(')[0]
     gas_price = soup.select('#gas-price')[0].text.replace('\n\n\n', '').replace(' ', '')
-    print(soup.select('#gas-price')[0].text)
     cpc = soup.select('#cpc')[0].text.replace(' ', '')
-    print(soup.select('#cpc')[0].text)
-    content = '{}\n{}{}'.format(title, gas_price, cpc)
+    content = '{}\n\n\n\n\n\n{}{}'.format(title, gas_price, cpc)
 
 
     return content
