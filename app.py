@@ -73,12 +73,11 @@ def oil_price():
     soup = BeautifulSoup(res.text, 'html.parser')
     title = soup.select('#main')[0].text.replace('\n', '').split('(')[0]
     gas_price = soup.select('#gas-price')[0].text.replace('\n\n\n', '').replace(' ', '')
-    cpc = soup.select('#cpc')[0].text.replace(' ', '')
-    content = '{}\n\n\n\n\n\n{}{}'.format(title, gas_price, cpc)
-
+    cpc1 = soup.select('#cpc')[0].text.replace(' ', '')
+    cpc2 = soup.select('#cpc')[1].text.replace(' ', '')
+    content = '{}\n{}{}{}'.format(title, gas_price, cpc1, cpc2)
 
     return content
-
 
 def get_answer(message_text):
     url = "https://robertbotman.azurewebsites.net/qnamaker/knowledgebases/1d8c9b09-00e3-432b-9ee0-18625e1ffd17/generateAnswer"
